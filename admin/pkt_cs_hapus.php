@@ -1,0 +1,30 @@
+<?php
+include 'header.php';
+include '../koneksi.php';
+
+// Cek login
+if (!isset($_SESSION['status']) || $_SESSION['status'] != "login") {
+    header("location: ../index.php?pesan=belum_login");
+    exit();
+}
+
+$laundry_id = $_SESSION['laundry_id'];
+$id_cs = isset($_GET['id_cs']) ? intval($_GET['id_cs']) : 0;
+
+
+// Proses hapus
+$hapus = mysqli_query($koneksi, "DELETE FROM tb_cuci_satuan WHERE id_cs = '$id_cs' AND laundry_id = '$laundry_id'");
+?>
+
+<?php if ($hapus) : ?>
+    <div class="alert alert-success text-center" style="margin-top: 20px;">
+        Paket berhasil dihapus! <a href="pkt_cs.php" class="alert-link">Lihat Daftar</a>
+    </div>
+<?php else : ?>
+    <div class="alert alert-danger text-center" style="margin-top: 20px;">
+        Gagal menghapus paket. <a href="pkt_cs.php" class="alert-link">Kembali</a>
+    </div>
+<?php endif; ?>
+
+
+<?php include 'footer.php'; ?>
