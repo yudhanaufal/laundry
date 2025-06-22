@@ -4,8 +4,10 @@ FROM php:8.2-fpm-alpine
 # Instal dependency sistem yang dibutuhkan oleh PHP extensions
 # Termasuk mysql-client untuk tools database jika diperlukan
 RUN apk add --no-cache \
+    nginx \
     mysql-client \
     git \
+    build-base \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -14,7 +16,7 @@ RUN apk add --no-cache \
     zlib-dev # Tambahkan ini untuk zip extension
 
 # Instal ekstensi PHP yang dibutuhkan untuk aplikasi Anda
-# mysqli untuk koneksi MySQL, gd untuk manipulasi gambar, zip untuk kompresi/dekompresi
+# mysqli untuk koneksi MySQL, gd untuk manipulasi gambar, zip untuk kompresi/dekompresi, intl untuk fungsi i18n
 RUN docker-php-ext-install -j$(nproc) pdo_mysql mysqli gd zip intl
 
 # Konfigurasi PHP FPM (opsional, sesuaikan jika Anda punya kebutuhan khusus)
