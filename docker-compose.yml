@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Service PHP-FPM
+  php-fpm:
+    build:
+      context: . # Merujuk ke direktori saat ini untuk Dockerfile
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html # Mount direktori aplikasi ke dalam container
+      # - ./php.ini:/usr/local/etc/php/php.ini # Opsional: jika Anda punya php.ini khusus
+    env_file:
+      - ./.env # Muat variabel lingkungan dari file .env
+    expose:
+      - "9000" # Ekspos port PHP-FPM ke Nginx
+    networks:
+      - app-network
+
+  # Service Nginx
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80" # Map port 80 host (VPS) ke port 80 container Nginx
+      # - "443:443" # Aktifkan ini jika Anda ingin HTTPS/SSL
+    volumes:
+      - .:/var/www/html # Mount direktori aplikasi ke dalam container
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf # Masukkan konfigurasi Nginx
+    depends_on:
+      - php-fpm # Nginx bergantung pada PHP-FPM
+    networks:
+      - app-network
+
+  # Service Database (MariaDB direkomendasikan untuk kompatibilitas MySQL)
+  db:
+    image: mariadb:10.6 # Atau mysql:8.0 jika Anda yakin butuh fitur MySQL 8
+    restart: always
+    env_file:
+      - ./.env # Muat variabel lingkungan dari file .env
+    volumes:
+      - db_data:/var/lib/mysql # Persistent storage untuk data database
+    networks:
+      - app-network
+
+volumes:
+  db_data: # Volume untuk menyimpan data database secara persisten
+
+networks:
+  app-network:
+    driver: bridge
